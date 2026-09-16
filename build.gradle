@@ -50,4 +50,6 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+    systemProperty 'net.bytebuddy.experimental', 'true'
+    jvmArgs '-XX:+EnableDynamicAgentLoading'
 }
