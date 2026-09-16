@@ -9,14 +9,15 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -37,7 +38,7 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(Long id, String email, String password, String fullName, Role role) {
+    public User(UUID id, String email, String password, String fullName, Role role) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -85,11 +86,11 @@ public class User implements UserDetails {
         return true;
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

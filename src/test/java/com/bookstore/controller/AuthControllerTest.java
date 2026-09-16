@@ -16,9 +16,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,7 +52,7 @@ class AuthControllerTest {
     @Test
     void shouldRegisterUserAndReturn201Created() throws Exception {
         RegisterRequest request = new RegisterRequest("john@example.com", "password123", "John Doe");
-        UserDto userDto = new UserDto(1L, "john@example.com", "John Doe", Role.ROLE_USER);
+        UserDto userDto = new UserDto(UUID.randomUUID(), "john@example.com", "John Doe", Role.ROLE_USER);
         AuthResponse response = new AuthResponse("mock-jwt-token", userDto);
 
         when(authService.register(any(RegisterRequest.class))).thenReturn(response);
@@ -81,7 +82,7 @@ class AuthControllerTest {
     @Test
     void shouldLoginAndReturn200Ok() throws Exception {
         LoginRequest request = new LoginRequest("john@example.com", "password123");
-        UserDto userDto = new UserDto(1L, "john@example.com", "John Doe", Role.ROLE_USER);
+        UserDto userDto = new UserDto(UUID.randomUUID(), "john@example.com", "John Doe", Role.ROLE_USER);
         AuthResponse response = new AuthResponse("mock-jwt-token", userDto);
 
         when(authService.login(any(LoginRequest.class))).thenReturn(response);

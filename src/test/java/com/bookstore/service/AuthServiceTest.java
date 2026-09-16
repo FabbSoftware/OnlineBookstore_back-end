@@ -21,6 +21,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -60,9 +61,10 @@ class AuthServiceTest {
 
     @Test
     void shouldRegisterNewUserSuccessfully() {
+        UUID userId = UUID.randomUUID();
         RegisterRequest request = new RegisterRequest("john@example.com", "secret123", "John Doe");
-        User savedUser = new User(1L, "john@example.com", "encodedPassword", "John Doe", Role.ROLE_USER);
-        UserDto userDto = new UserDto(1L, "john@example.com", "John Doe", Role.ROLE_USER);
+        User savedUser = new User(userId, "john@example.com", "encodedPassword", "John Doe", Role.ROLE_USER);
+        UserDto userDto = new UserDto(userId, "john@example.com", "John Doe", Role.ROLE_USER);
 
         when(userRepository.existsByEmail("john@example.com")).thenReturn(false);
         when(passwordEncoder.encode("secret123")).thenReturn("encodedPassword");
@@ -92,9 +94,10 @@ class AuthServiceTest {
 
     @Test
     void shouldLoginSuccessfullyWithValidCredentials() {
+        UUID userId = UUID.randomUUID();
         LoginRequest request = new LoginRequest("john@example.com", "secret123");
-        User user = new User(1L, "john@example.com", "encodedPassword", "John Doe", Role.ROLE_USER);
-        UserDto userDto = new UserDto(1L, "john@example.com", "John Doe", Role.ROLE_USER);
+        User user = new User(userId, "john@example.com", "encodedPassword", "John Doe", Role.ROLE_USER);
+        UserDto userDto = new UserDto(userId, "john@example.com", "John Doe", Role.ROLE_USER);
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()));
