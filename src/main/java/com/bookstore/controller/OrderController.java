@@ -5,6 +5,7 @@ import com.bookstore.dto.order.CheckoutRequest;
 import com.bookstore.dto.order.OrderDto;
 import com.bookstore.service.OrderService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -27,12 +28,13 @@ public class OrderController {
             @AuthenticationPrincipal User user,
             @Valid @RequestBody CheckoutRequest request
     ) {
-        return null;
+        OrderDto order = orderService.createOrder(user, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
 
     @GetMapping
     public ResponseEntity<List<OrderDto>> getOrderHistory(@AuthenticationPrincipal User user) {
-        return null;
+        return ResponseEntity.ok(orderService.getOrderHistory(user));
     }
 
     @GetMapping("/{id}")
@@ -40,6 +42,6 @@ public class OrderController {
             @AuthenticationPrincipal User user,
             @PathVariable UUID id
     ) {
-        return null;
+        return ResponseEntity.ok(orderService.getOrderById(user, id));
     }
 }
