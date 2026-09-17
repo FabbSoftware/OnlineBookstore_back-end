@@ -41,6 +41,15 @@ public class OrderService {
             }
         }
 
+        Order order = getOrder(user, request, cart);
+        Order savedOrder = orderRepository.save(order);
+
+        cart.clear();
+
+        return orderMapper.toDto(savedOrder);
+    }
+
+    private static Order getOrder(User user, CheckoutRequest request, Cart cart) {
         Order order = new Order(user, BigDecimal.ZERO, OrderStatus.CONFIRMED, request.shippingAddress(), request.contactPhone());
         BigDecimal totalAmount = BigDecimal.ZERO;
 
@@ -54,11 +63,7 @@ public class OrderService {
         }
 
         order.setTotalAmount(totalAmount);
-        Order savedOrder = orderRepository.save(order);
-
-        cart.clear();
-
-        return orderMapper.toDto(savedOrder);
+        return order;
     }
 
     @Transactional(readOnly = true)
