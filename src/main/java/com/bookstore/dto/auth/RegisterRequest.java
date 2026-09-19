@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+import org.springframework.lang.NonNull;
 
 import java.util.Arrays;
 
@@ -30,6 +31,7 @@ public record RegisterRequest(
     }
 
     @Override
+    @NonNull
     public String toString() {
         return "RegisterRequest[email=" + email + ", fullName=" + fullName + ", password=[PROTECTED]]";
     }

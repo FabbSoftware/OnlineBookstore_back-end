@@ -9,9 +9,9 @@ import com.bookstore.dto.user.UserDto;
 import com.bookstore.exception.BadRequestException;
 import com.bookstore.mapper.UserMapper;
 import com.bookstore.security.JwtService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -44,18 +44,8 @@ class AuthServiceTest {
     @Mock
     private UserMapper userMapper;
 
+    @InjectMocks
     private AuthService authService;
-
-    @BeforeEach
-    void setUp() {
-        authService = new AuthService(
-                userService,
-                passwordEncoder,
-                jwtService,
-                authenticationManager,
-                userMapper
-        );
-    }
 
     @Test
     void shouldRegisterNewUserSuccessfully() {

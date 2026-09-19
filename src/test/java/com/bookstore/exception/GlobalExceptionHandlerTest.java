@@ -34,8 +34,7 @@ class GlobalExceptionHandlerTest {
         }
 
         @PostMapping("/test/validation")
-        public void validation(@Valid @RequestBody DummyDto dto) {
-        }
+        public void validation(@Valid @RequestBody DummyDto dto) {}
 
         @GetMapping("/test/unhandled")
         public void unhandled() {

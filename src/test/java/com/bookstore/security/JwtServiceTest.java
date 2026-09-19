@@ -12,15 +12,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 class JwtServiceTest {
 
     private JwtService jwtService;
-    // 256-bit test secret in base64
-    private final String secret = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
-    private final long expirationMs = 3600000; // 1 hour
 
     @BeforeEach
     void setUp() {
         JwtProperties properties = new JwtProperties();
-        properties.setSecret(secret);
-        properties.setExpirationMs(expirationMs);
+        // 256-bit test secret in base64
+        String SECRET = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
+        properties.setSecret(SECRET);
+        // 1 hour
+        long EXPIRATION_MS = 3600000;
+        properties.setExpirationMs(EXPIRATION_MS);
         jwtService = new JwtService(properties);
     }
 

@@ -1,6 +1,7 @@
 package com.bookstore.dto.auth;
 
 import com.bookstore.dto.user.UserDto;
+import org.springframework.lang.NonNull;
 
 public record AuthResponse(
         String token,
@@ -12,6 +13,7 @@ public record AuthResponse(
     }
 
     @Override
+    @NonNull
     public String toString() {
         return "AuthResponse[token=[PROTECTED], tokenType=" + tokenType + ", user=" + user + "]";
     }

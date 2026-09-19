@@ -5,9 +5,9 @@ import com.bookstore.dto.book.BookDto;
 import com.bookstore.exception.ResourceNotFoundException;
 import com.bookstore.mapper.BookMapper;
 import com.bookstore.repository.BookRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -29,12 +29,8 @@ class BookServiceTest {
     @Mock
     private BookMapper bookMapper;
 
+    @InjectMocks
     private BookService bookService;
-
-    @BeforeEach
-    void setUp() {
-        bookService = new BookService(bookRepository, bookMapper);
-    }
 
     @Test
     void shouldReturnAllBooksWhenNoQueryProvided() {

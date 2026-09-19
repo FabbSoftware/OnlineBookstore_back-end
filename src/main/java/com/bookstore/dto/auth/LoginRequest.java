@@ -3,6 +3,7 @@ package com.bookstore.dto.auth;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import org.springframework.lang.NonNull;
 
 import java.util.Arrays;
 
@@ -25,6 +26,7 @@ public record LoginRequest(
     }
 
     @Override
+    @NonNull
     public String toString() {
         return "LoginRequest[email=" + email + ", password=[PROTECTED]]";
     }
