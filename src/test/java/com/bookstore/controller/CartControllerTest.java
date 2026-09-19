@@ -9,7 +9,9 @@ import com.bookstore.dto.cart.UpdateCartItemRequest;
 import com.bookstore.exception.BadRequestException;
 import com.bookstore.exception.GlobalExceptionHandler;
 import com.bookstore.exception.ResourceNotFoundException;
+import com.bookstore.security.UserPrincipal;
 import com.bookstore.service.CartService;
+import com.bookstore.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -35,6 +38,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -49,10 +53,14 @@ class CartControllerTest {
     @Mock
     private CartService cartService;
 
+    @Mock
+    private UserService userService;
+
     @InjectMocks
     private CartController cartController;
 
     private User testUser;
+    private UserPrincipal testPrincipal;
     private CartDto sampleCartDto;
     private UUID cartId;
     private UUID itemId;
@@ -61,9 +69,12 @@ class CartControllerTest {
     @BeforeEach
     void setUp() {
         testUser = new User(UUID.randomUUID(), "user@example.com", "pass", "Jane Doe", Role.ROLE_USER);
+        testPrincipal = UserPrincipal.fromUserForJwt(testUser);
         cartId = UUID.randomUUID();
         itemId = UUID.randomUUID();
         bookId = UUID.randomUUID();
+
+        lenient().when(userService.getById(any(UUID.class))).thenReturn(testUser);
 
         CartItemDto itemDto = new CartItemDto(
                 itemId,
@@ -84,9 +95,9 @@ class CartControllerTest {
             }
 
             @Override
-            public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-                                          NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-                return testUser;
+            public Object resolveArgument(@NonNull MethodParameter parameter, ModelAndViewContainer mavContainer,
+                                          @NonNull NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+                return testPrincipal;
             }
         };
 

@@ -68,8 +68,12 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest request) {
         try {
+            CharBuffer passwordBuffer = request.password() != null
+                    ? CharBuffer.wrap(request.password())
+                    : CharBuffer.wrap("");
+
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.email(), request.password())
+                    new UsernamePasswordAuthenticationToken(request.email(), passwordBuffer)
             );
 
             User user = userService.getByEmail(request.email());

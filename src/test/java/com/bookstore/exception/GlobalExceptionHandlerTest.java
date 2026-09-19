@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +33,16 @@ class GlobalExceptionHandlerTest {
         @GetMapping("/test/bad-request")
         public void badRequest() {
             throw new BadRequestException("Invalid query parameter");
+        }
+
+        @GetMapping("/test/bad-credentials")
+        public void badCredentials() {
+            throw new BadCredentialsException("Bad credentials");
+        }
+
+        @GetMapping("/test/username-not-found")
+        public void usernameNotFound() {
+            throw new UsernameNotFoundException("User not found with email: test@example.com");
         }
 
         @PostMapping("/test/validation")
@@ -82,6 +94,26 @@ class GlobalExceptionHandlerTest {
                 .andExpect(jsonPath("$.error", is("Validation Failed")))
                 .andExpect(jsonPath("$.fieldErrors[0].field", is("title")))
                 .andExpect(jsonPath("$.fieldErrors[0].message", is("Title is required")));
+    }
+
+    @Test
+    void shouldReturn401WhenBadCredentialsExceptionThrown() throws Exception {
+        mockMvc.perform(get("/test/bad-credentials"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status", is(401)))
+                .andExpect(jsonPath("$.error", is("Unauthorized")))
+                .andExpect(jsonPath("$.message", is("Bad credentials")))
+                .andExpect(jsonPath("$.timestamp", notNullValue()));
+    }
+
+    @Test
+    void shouldReturn401WhenUsernameNotFoundExceptionThrown() throws Exception {
+        mockMvc.perform(get("/test/username-not-found"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status", is(401)))
+                .andExpect(jsonPath("$.error", is("Unauthorized")))
+                .andExpect(jsonPath("$.message", is("User not found with email: test@example.com")))
+                .andExpect(jsonPath("$.timestamp", notNullValue()));
     }
 
     @Test

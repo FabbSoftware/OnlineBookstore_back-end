@@ -20,8 +20,8 @@ public class BookController {
 
     @GetMapping
     public ResponseEntity<List<BookDto>> getAllBooks(
-            @RequestParam(name = "q", required = false) String query) {
-        return ResponseEntity.ok(bookService.getAllBooks(query));
+            @RequestParam(name = "q", required = false) String q) {
+        return ResponseEntity.ok(bookService.getAllBooks(q));
     }
 
     @GetMapping("/{id}")
