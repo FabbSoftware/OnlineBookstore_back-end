@@ -42,10 +42,6 @@ public class CartItem {
         return id;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public Cart getCart() {
         return cart;
     }
