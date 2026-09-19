@@ -16,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.CharBuffer;
+
 @Service
 public class AuthService {
 
@@ -41,32 +43,44 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.email())) {
-            throw new BadRequestException("Email is already in use");
+        try {
+            if (userRepository.existsByEmail(request.email())) {
+                throw new BadRequestException("Email is already in use");
+            }
+
+            CharBuffer passwordBuffer = request.password() != null
+                    ? CharBuffer.wrap(request.password())
+                    : CharBuffer.wrap("");
+
+            User user = new User(
+                    request.email(),
+                    passwordEncoder.encode(passwordBuffer),
+                    request.fullName(),
+                    Role.ROLE_USER
+            );
+
+            User savedUser = userRepository.save(user);
+            String token = jwtService.generateToken(savedUser);
+
+            return new AuthResponse(token, userMapper.toDto(savedUser));
+        } finally {
+            request.erasePassword();
         }
-
-        User user = new User(
-                request.email(),
-                passwordEncoder.encode(request.password()),
-                request.fullName(),
-                Role.ROLE_USER
-        );
-
-        User savedUser = userRepository.save(user);
-        String token = jwtService.generateToken(savedUser);
-
-        return new AuthResponse(token, userMapper.toDto(savedUser));
     }
 
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.email(), request.password())
+            );
 
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + request.email()));
+            User user = userRepository.findByEmail(request.email())
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + request.email()));
 
-        String token = jwtService.generateToken(user);
-        return new AuthResponse(token, userMapper.toDto(user));
+            String token = jwtService.generateToken(user);
+            return new AuthResponse(token, userMapper.toDto(user));
+        } finally {
+            request.erasePassword();
+        }
     }
 }

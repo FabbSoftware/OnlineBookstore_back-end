@@ -2,12 +2,30 @@ package com.bookstore.dto.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+
+import java.util.Arrays;
 
 public record LoginRequest(
         @NotBlank(message = "Email is required")
         @Email(message = "Invalid email format")
         String email,
 
-        @NotBlank(message = "Password is required")
-        String password
-) {}
+        @NotEmpty(message = "Password is required")
+        char[] password
+) {
+    public LoginRequest(String email, String password) {
+        this(email, password != null ? password.toCharArray() : null);
+    }
+
+    public void erasePassword() {
+        if (password != null) {
+            Arrays.fill(password, '\0');
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "LoginRequest[email=" + email + ", password=[PROTECTED]]";
+    }
+}

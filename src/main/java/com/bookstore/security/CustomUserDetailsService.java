@@ -18,6 +18,13 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username)
+                .map(UserPrincipal::fromUserForAuthentication)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
+    }
+
+    public UserDetails loadUserByUsernameWithoutCredentials(String username) throws UsernameNotFoundException {
+        return userRepository.findByEmail(username)
+                .map(UserPrincipal::fromUserForJwt)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
     }
 }

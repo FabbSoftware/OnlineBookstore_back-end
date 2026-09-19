@@ -10,4 +10,9 @@ public record AuthResponse(
     public AuthResponse(String token, UserDto user) {
         this(token, "Bearer", user);
     }
+
+    @Override
+    public String toString() {
+        return "AuthResponse[token=[PROTECTED], tokenType=" + tokenType + ", user=" + user + "]";
+    }
 }

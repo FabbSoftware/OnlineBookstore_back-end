@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,9 +18,20 @@ import java.util.function.Function;
 public class JwtService {
 
     private final JwtProperties properties;
+    private final SecretKey signingKey;
 
     public JwtService(JwtProperties properties) {
         this.properties = properties;
+        this.signingKey = initSigningKey(properties.getSecret());
+    }
+
+    private SecretKey initSigningKey(String secret) {
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        try {
+            return Keys.hmacShaKeyFor(keyBytes);
+        } finally {
+            Arrays.fill(keyBytes, (byte) 0);
+        }
     }
 
     public String generateToken(UserDetails userDetails) {
@@ -67,7 +79,6 @@ public class JwtService {
     }
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(properties.getSecret());
-        return Keys.hmacShaKeyFor(keyBytes);
+        return this.signingKey;
     }
 }

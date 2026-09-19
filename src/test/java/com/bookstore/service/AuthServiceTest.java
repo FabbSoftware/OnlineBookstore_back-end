@@ -67,7 +67,7 @@ class AuthServiceTest {
         UserDto userDto = new UserDto(userId, "john@example.com", "John Doe", Role.ROLE_USER);
 
         when(userRepository.existsByEmail("john@example.com")).thenReturn(false);
-        when(passwordEncoder.encode("secret123")).thenReturn("encodedPassword");
+        when(passwordEncoder.encode(any(CharSequence.class))).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
         when(jwtService.generateToken(any(User.class))).thenReturn("jwt-token-123");
         when(userMapper.toDto(savedUser)).thenReturn(userDto);
