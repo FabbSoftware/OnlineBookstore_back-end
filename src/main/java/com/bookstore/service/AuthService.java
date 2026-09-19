@@ -6,9 +6,7 @@ import com.bookstore.dto.auth.AuthResponse;
 import com.bookstore.dto.auth.LoginRequest;
 import com.bookstore.dto.auth.RegisterRequest;
 import com.bookstore.exception.BadRequestException;
-import com.bookstore.exception.ResourceNotFoundException;
 import com.bookstore.mapper.UserMapper;
-import com.bookstore.repository.UserRepository;
 import com.bookstore.security.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,20 +19,20 @@ import java.nio.CharBuffer;
 @Service
 public class AuthService {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
 
     public AuthService(
-            UserRepository userRepository,
+            UserService userService,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
             AuthenticationManager authenticationManager,
             UserMapper userMapper
     ) {
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
@@ -44,7 +42,7 @@ public class AuthService {
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         try {
-            if (userRepository.existsByEmail(request.email())) {
+            if (userService.existsByEmail(request.email())) {
                 throw new BadRequestException("Email is already in use");
             }
 
@@ -59,7 +57,7 @@ public class AuthService {
                     Role.ROLE_USER
             );
 
-            User savedUser = userRepository.save(user);
+            User savedUser = userService.save(user);
             String token = jwtService.generateToken(savedUser);
 
             return new AuthResponse(token, userMapper.toDto(savedUser));
@@ -74,8 +72,7 @@ public class AuthService {
                     new UsernamePasswordAuthenticationToken(request.email(), request.password())
             );
 
-            User user = userRepository.findByEmail(request.email())
-                    .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + request.email()));
+            User user = userService.getByEmail(request.email());
 
             String token = jwtService.generateToken(user);
             return new AuthResponse(token, userMapper.toDto(user));
